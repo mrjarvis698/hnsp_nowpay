@@ -10,7 +10,11 @@ from openpyxl.workbook import Workbook
 from openpyxl import load_workbook
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 import time
 
 root = tkinter.Tk()
@@ -92,8 +96,36 @@ def cc_expiry():
   expiry_month = workbook_expiry_month[:2]
   expiry_year = workbook_expiry_year[3:]
 
+def textbox_field(xpath, timeout_time, send_keys_data):
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
+  except TimeoutException:
+    timeout_exception()
+  else :
+    textbox_elements = driver.find_element_by_xpath (xpath)
+    textbox_elements.send_keys(send_keys_data)
+
+def button_field(button_xpath, timeout_time):
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, button_xpath)))
+  except TimeoutException:
+    timeout_exception()
+  else :
+    page_button = driver.find_element_by_xpath (button_xpath)
+    page_button.click()
+
 def start_link():
   driver.get("https://hnsp.nowpay.co.in/")
+
+def pageone():
+    textbox_field('//*[@id="paymentmaster-first_name"]', 8, settings_data['first_name'])
+    textbox_field('//*[@id="paymentmaster-last_name"]', 8, settings_data['last_name'])
+    textbox_field('//*[@id="paymentmaster-email"]', 8, settings_data['email_id'])
+    textbox_field('//*[@id="paymentmaster-phone"]', 8, settings_data['registered_mobile_no'])
+    textbox_field('//*[@id="paymentmaster-address"]', 8, settings_data['address'])
+    textbox_field('//*[@id="paymentmaster-city"]', 8, settings_data['address'])
+    button_field('//*[@id="subm"]', 8)
+    time.sleep (1000)
 
 def output_save():
   entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_atm_pin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
@@ -103,11 +135,21 @@ def output_save():
       page.append(info)
   output_wb.save(filename='Output.xlsx')
 
+def timeout_exception():
+    start_link()
+    pageone()
+    print ("exception")
+
 def whole_work():
     start_link()
+    pageone()
 
 
-driver=webdriver.Chrome("chromedriver.exe")
+caps = DesiredCapabilities().CHROME
+caps["pageLoadStrategy"] = "none"
+#caps["pageLoadStrategy"] = "eager"
+#caps["pageLoadStrategy"] = "normal"
+driver=webdriver.Chrome(desired_capabilities=caps, executable_path="chromedriver.exe")
 driver.maximize_window()
 try:
   cal()
