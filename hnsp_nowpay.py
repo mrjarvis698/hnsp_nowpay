@@ -92,10 +92,18 @@ def cal():
 def cc_expiry():
   global expiry_month
   global expiry_year
+  global expiry_year1
+  global expiry_year2
+  global expiry_year3
+  global expiry_year4
   workbook_expiry_month = input_workbook_expiry_number[x]
   workbook_expiry_year = input_workbook_expiry_number[x]
   expiry_month = workbook_expiry_month[:2]
   expiry_year = workbook_expiry_year[5:]
+  expiry_year1 = workbook_expiry_year[3]
+  expiry_year2 = workbook_expiry_year[4]
+  expiry_year3 = workbook_expiry_year[5]
+  expiry_year4 = workbook_expiry_year[6]
 
 def textbox_field(xpath, timeout_time, send_keys_data):
   try :
@@ -148,6 +156,16 @@ def pagetwo():
     textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[2]/div/div/input')
     textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[2]/div/div/input', 8, input_workbook_cvv_number[x])
     button_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[3]/input', 8)
+
+def pagethree():
+    button_field('//*[@id="tab-B-label"]/span', 8)
+    textbox_field('//*[@id="expDate"]', 8, expiry_month)
+    textbox_field('//*[@id="expDate"]', 8, expiry_year1)
+    textbox_field('//*[@id="expDate"]', 8, expiry_year2)
+    textbox_field('//*[@id="expDate"]', 8, expiry_year3)
+    textbox_field('//*[@id="expDate"]', 8, expiry_year4)
+    textbox_field('//*[@id="pin"]', 8, input_workbook_atm_pin[x])
+    button_field('//*[@id="submitButtonIdForPin"]', 8)
     time.sleep(1000)
 
 
@@ -165,6 +183,7 @@ def timeout_exception():
     cc_expiry()
     time.sleep(2)
     pagetwo()
+    pagethree()
     print ("exception")
 
 def whole_work():
@@ -173,6 +192,7 @@ def whole_work():
     cc_expiry()
     time.sleep(2)
     pagetwo()
+    pagethree()
 
 
 caps = DesiredCapabilities().CHROME
@@ -196,9 +216,3 @@ else:
     done_transactions_wb_1[h] = 0
 
 driver.quit()
-
-#//*[@id="tab-B-label"]
-#//*[@id="tab-B-label"]/span
-#//*[@id="expDate"] #exp date
-#s//*[@id="pin"] #ATMPIN
-#//*[@id="submitButtonIdForPin"] #SUBMIT
