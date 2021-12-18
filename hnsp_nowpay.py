@@ -15,6 +15,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 root = tkinter.Tk()
@@ -94,7 +95,7 @@ def cc_expiry():
   workbook_expiry_month = input_workbook_expiry_number[x]
   workbook_expiry_year = input_workbook_expiry_number[x]
   expiry_month = workbook_expiry_month[:2]
-  expiry_year = workbook_expiry_year[3:]
+  expiry_year = workbook_expiry_year[5:]
 
 def textbox_field(xpath, timeout_time, send_keys_data):
   try :
@@ -114,6 +115,17 @@ def button_field(button_xpath, timeout_time):
     page_button = driver.find_element_by_xpath (button_xpath)
     page_button.click()
 
+
+def textbox_field_click(xpath):
+  try :
+    time.sleep(0.50)
+    act.click(driver.find_element_by_xpath (xpath)).perform()
+    #WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
+  except NoSuchElementException:
+    timeout_exception()
+  else :
+    act.click(driver.find_element_by_xpath (xpath)).perform()
+
 def start_link():
   driver.get("https://hnsp.nowpay.co.in/")
 
@@ -125,7 +137,19 @@ def pageone():
     textbox_field('//*[@id="paymentmaster-address"]', 8, settings_data['address'])
     textbox_field('//*[@id="paymentmaster-city"]', 8, settings_data['address'])
     button_field('//*[@id="subm"]', 8)
-    time.sleep (1000)
+
+def pagetwo():
+    textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[1]/div/input')
+    textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[1]/div/input', 8, input_workbook_cc_number[x])
+    
+    textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[1]/div/div/input')
+    textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[1]/div/div/input', 8, expiry_month + expiry_year)
+
+    textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[2]/div/div/input')
+    textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[2]/div/div/input', 8, input_workbook_cvv_number[x])
+    button_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[3]/input', 8)
+    time.sleep(1000)
+
 
 def output_save():
   entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_atm_pin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
@@ -138,11 +162,17 @@ def output_save():
 def timeout_exception():
     start_link()
     pageone()
+    cc_expiry()
+    time.sleep(2)
+    pagetwo()
     print ("exception")
 
 def whole_work():
     start_link()
     pageone()
+    cc_expiry()
+    time.sleep(2)
+    pagetwo()
 
 
 caps = DesiredCapabilities().CHROME
@@ -151,6 +181,7 @@ caps["pageLoadStrategy"] = "none"
 #caps["pageLoadStrategy"] = "normal"
 driver=webdriver.Chrome(desired_capabilities=caps, executable_path="chromedriver.exe")
 driver.maximize_window()
+act = ActionChains(driver)
 try:
   cal()
 except IndexError:
@@ -165,3 +196,9 @@ else:
     done_transactions_wb_1[h] = 0
 
 driver.quit()
+
+#//*[@id="tab-B-label"]
+#//*[@id="tab-B-label"]/span
+#//*[@id="expDate"] #exp date
+#s//*[@id="pin"] #ATMPIN
+#//*[@id="submitButtonIdForPin"] #SUBMIT
