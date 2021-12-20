@@ -106,42 +106,46 @@ def cc_expiry():
   expiry_year4 = workbook_expiry_year[6]
 
 def textbox_field(xpath, timeout_time, send_keys_data):
+  global timeout_exception
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
   except TimeoutException:
     timeout_exception = True
-    print("textbox")
   else :
+    timeout_exception = False
     textbox_elements = driver.find_element_by_xpath (xpath)
     textbox_elements.send_keys(send_keys_data)
 
 def button_field(button_xpath, timeout_time):
+  global timeout_exception
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, button_xpath)))
   except TimeoutException:
     timeout_exception = True
-    print("button")
   else :
+    timeout_exception = False
     page_button = driver.find_element_by_xpath (button_xpath)
     page_button.click()
 
 
 def textbox_field_click(xpath, timeout_time):
+  global timeout_exception
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
   except TimeoutException:
     timeout_exception = True
-    print("click")
   else :
+    timeout_exception = False
     act.click(driver.find_element_by_xpath (xpath)).perform()
 
 def textbox_field_click_css_selector(xpath, timeout_time):
+  global timeout_exception
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.CSS_SELECTOR, xpath)))
   except TimeoutException:
     timeout_exception = True
-    print("click")
   else :
+    timeout_exception = False
     act.click(driver.find_element_by_css_selector (xpath)).perform()
   
 def start_link():
@@ -174,6 +178,77 @@ def page_three():
   textbox_field('//*[@id="card_cvv"]', 8, input_workbook_cvv_number[x])
   button_field('//*[@id="footer-cta"]', 8)
 
+# exception
+def textbox_field1(xpath, timeout_time, send_keys_data):
+  global timeout_exception1
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
+  except TimeoutException:
+    timeout_exception1 = True
+  else :
+    timeout_exception1 = False
+    textbox_elements = driver.find_element_by_xpath (xpath)
+    textbox_elements.send_keys(send_keys_data)
+
+def button_field1(button_xpath, timeout_time):
+  global timeout_exception1
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, button_xpath)))
+  except TimeoutException:
+    timeout_exception1 = True
+  else :
+    timeout_exception1 = False
+    page_button = driver.find_element_by_xpath (button_xpath)
+    page_button.click()
+
+
+def textbox_field_click1(xpath, timeout_time):
+  global timeout_exception1
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
+  except TimeoutException:
+    timeout_exception1 = True
+  else :
+    timeout_exception1 = False
+    act.click(driver.find_element_by_xpath (xpath)).perform()
+
+def textbox_field_click_css_selector1(xpath, timeout_time):
+  global timeout_exception1
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.CSS_SELECTOR, xpath)))
+  except TimeoutException:
+    timeout_exception1 = True
+  else :
+    timeout_exception1 = False
+    act.click(driver.find_element_by_css_selector (xpath)).perform()
+
+def page_one1():
+  textbox_field1('//*[@id="txtlanno"]', 8, settings_data['LAN'])
+  button_field1('//*[@id="next"]', 8)
+
+def page_two1():
+  time.sleep(0.75)
+  textbox_field_click1('//*[@id="Other"]', 8)
+  textbox_field1('//*[@id="txtamount"]', 8, settings_data['payable_amount'])
+  button_field1('//*[@id="btnPay"]', 8)
+
+def page_three1():
+
+  driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
+  time.sleep(0.50)
+  driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
+  #driver.switch_to.frame(driver.find_element_by_class_name("razorpay-checkout-frame"))
+  textbox_field1('//*[@id="contact"]', 8, settings_data['registered_mobile_no'])
+  textbox_field1('//*[@id="email"]', 8, settings_data['email_id'])
+  button_field1('//*[@id="footer-cta"]', 8)
+  
+  textbox_field_click_css_selector1('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)', 8)
+  textbox_field1('//*[@id="card_number"]', 8, input_workbook_cc_number[x])
+  textbox_field1('//*[@id="card_expiry"]', 8, expiry_month + expiry_year3 + expiry_year4)
+  textbox_field1('//*[@id="card_name"]', 8, settings_data['first_name'])
+  textbox_field1('//*[@id="card_cvv"]', 8, input_workbook_cvv_number[x])
+  button_field1('//*[@id="footer-cta"]', 8)
+
 def output_save():
   entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_atm_pin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
   output_wb = load_workbook(output_sheet_file_path)
@@ -181,6 +256,13 @@ def output_save():
   for info in entry_list:
       page.append(info)
   output_wb.save(filename='Output.xlsx')
+
+def exception_work():
+    start_link()
+    page_one1()
+    page_two1()
+    cc_expiry()
+    page_three1()
 
 def whole_work():
     start_link()
