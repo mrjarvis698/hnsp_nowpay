@@ -61,7 +61,7 @@ settings_data = json.load(json_file)
 input_workbook_cc_number = input_workbook['Card Number'].values.tolist()
 input_workbook_cvv_number = input_workbook['CVV'].values.tolist()
 input_workbook_expiry_number = input_workbook['Expiry'].values.tolist()
-input_workbook_atm_pin = input_workbook['ATM pin'].values.tolist()
+input_workbook_ipin = input_workbook['Ipin'].values.tolist()
 input_workbook_desk_number = input_workbook['Desk'].values.tolist()
 
 # get-output sheet to append output
@@ -69,7 +69,7 @@ output_sheet = path.exists("Output.xlsx")
 if output_sheet == True :
   output_sheet_file_path = "Output.xlsx"
 else :
-  output_headers= ['FirstName','LastName', 'Mobile', 'Email','Amount', 'CardNumber', 'CVV', 'Expiry', 'ATM pin', 'No.of Transactions', 'Desk', "Desk Holder"]
+  output_headers= ['FirstName','LastName', 'Mobile', 'Email','Amount', 'CardNumber', 'CVV', 'Expiry', 'Ipin', 'No.of Transactions', 'Desk', "Desk Holder"]
   overall_output = Workbook()
   page = overall_output.active
   page.append(output_headers)
@@ -109,7 +109,8 @@ def textbox_field(xpath, timeout_time, send_keys_data):
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
   except TimeoutException:
-    timeout_exception()
+    timeout_exception = True
+    print("textbox")
   else :
     textbox_elements = driver.find_element_by_xpath (xpath)
     textbox_elements.send_keys(send_keys_data)
@@ -118,56 +119,60 @@ def button_field(button_xpath, timeout_time):
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, button_xpath)))
   except TimeoutException:
-    timeout_exception()
+    timeout_exception = True
+    print("button")
   else :
     page_button = driver.find_element_by_xpath (button_xpath)
     page_button.click()
 
 
-def textbox_field_click(xpath):
+def textbox_field_click(xpath, timeout_time):
   try :
-    time.sleep(0.50)
-    act.click(driver.find_element_by_xpath (xpath)).perform()
-    #WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
-  except NoSuchElementException:
-    timeout_exception()
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
+  except TimeoutException:
+    timeout_exception = True
+    print("click")
   else :
     act.click(driver.find_element_by_xpath (xpath)).perform()
 
+def textbox_field_click_css_selector(xpath, timeout_time):
+  try :
+    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.CSS_SELECTOR, xpath)))
+  except TimeoutException:
+    timeout_exception = True
+    print("click")
+  else :
+    act.click(driver.find_element_by_css_selector (xpath)).perform()
+  
 def start_link():
-  driver.get("https://hnsp.nowpay.co.in/")
+  driver.get("https://mfq.manbafinance.com/paymentwebsite")
 
-def pageone():
-    textbox_field('//*[@id="paymentmaster-first_name"]', 8, settings_data['first_name'])
-    textbox_field('//*[@id="paymentmaster-last_name"]', 8, settings_data['last_name'])
-    textbox_field('//*[@id="paymentmaster-email"]', 8, settings_data['email_id'])
-    textbox_field('//*[@id="paymentmaster-phone"]', 8, settings_data['registered_mobile_no'])
-    textbox_field('//*[@id="paymentmaster-address"]', 8, settings_data['address'])
-    textbox_field('//*[@id="paymentmaster-city"]', 8, settings_data['address'])
-    button_field('//*[@id="subm"]', 8)
+def page_one():
+  textbox_field('//*[@id="txtlanno"]', 8, settings_data['LAN'])
+  button_field('//*[@id="next"]', 8)
 
-def pagetwo():
-    textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[1]/div/input')
-    textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[1]/div/input', 8, input_workbook_cc_number[x])
-    
-    textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[1]/div/div/input')
-    textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[1]/div/div/input', 8, expiry_month + expiry_year)
+def page_two():
+  time.sleep(0.75)
+  textbox_field_click('//*[@id="Other"]', 8)
+  textbox_field('//*[@id="txtamount"]', 8, settings_data['payable_amount'])
+  button_field('//*[@id="btnPay"]', 8)
 
-    textbox_field_click('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[2]/div/div/input')
-    textbox_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[1]/div[3]/div/div[2]/div/div/input', 8, input_workbook_cvv_number[x])
-    button_field('//*[@id="wrap"]/div[3]/div[2]/div/div[2]/div[4]/div[1]/div[5]/div[1]/div[3]/input', 8)
+def page_three():
 
-def pagethree():
-    button_field('//*[@id="tab-B-label"]/span', 8)
-    textbox_field('//*[@id="expDate"]', 8, expiry_month)
-    textbox_field('//*[@id="expDate"]', 8, expiry_year1)
-    textbox_field('//*[@id="expDate"]', 8, expiry_year2)
-    textbox_field('//*[@id="expDate"]', 8, expiry_year3)
-    textbox_field('//*[@id="expDate"]', 8, expiry_year4)
-    textbox_field('//*[@id="pin"]', 8, input_workbook_atm_pin[x])
-    button_field('//*[@id="submitButtonIdForPin"]', 8)
-    time.sleep(1000)
-
+  driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
+  time.sleep(0.50)
+  driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
+  #driver.switch_to.frame(driver.find_element_by_class_name("razorpay-checkout-frame"))
+  textbox_field('//*[@id="contact"]', 8, settings_data['registered_mobile_no'])
+  textbox_field('//*[@id="email"]', 8, settings_data['email_id'])
+  button_field('//*[@id="footer-cta"]', 8)
+  
+  textbox_field_click_css_selector('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)', 8)
+  textbox_field('//*[@id="card_number"]', 8, input_workbook_cc_number[x])
+  textbox_field('//*[@id="card_expiry"]', 8, expiry_month + expiry_year3 + expiry_year4)
+  textbox_field('//*[@id="card_name"]', 8, settings_data['first_name'])
+  textbox_field('//*[@id="card_cvv"]', 8, input_workbook_cvv_number[x])
+  button_field('//*[@id="footer-cta"]', 8)
 
 def output_save():
   entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_atm_pin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
@@ -177,29 +182,20 @@ def output_save():
       page.append(info)
   output_wb.save(filename='Output.xlsx')
 
-def timeout_exception():
-    start_link()
-    pageone()
-    cc_expiry()
-    time.sleep(2)
-    pagetwo()
-    pagethree()
-    print ("exception")
-
 def whole_work():
     start_link()
-    pageone()
+    page_one()
+    page_two()
     cc_expiry()
-    time.sleep(2)
-    pagetwo()
-    pagethree()
+    page_three()
 
-
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--incognito")
 caps = DesiredCapabilities().CHROME
 caps["pageLoadStrategy"] = "none"
 #caps["pageLoadStrategy"] = "eager"
 #caps["pageLoadStrategy"] = "normal"
-driver=webdriver.Chrome(desired_capabilities=caps, executable_path="chromedriver.exe")
+driver=webdriver.Chrome(chrome_options=chrome_options, desired_capabilities=caps, executable_path="chromedriver.exe")
 driver.maximize_window()
 act = ActionChains(driver)
 try:
