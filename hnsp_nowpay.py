@@ -166,8 +166,22 @@ def pagethree():
     textbox_field('//*[@id="expDate"]', 8, expiry_year4)
     textbox_field('//*[@id="pin"]', 8, input_workbook_atm_pin[x])
     button_field('//*[@id="submitButtonIdForPin"]', 8)
-    time.sleep(1000)
 
+def output():
+  global output_status
+  global transaction_output_status
+  try :
+    WebDriverWait(driver, timeout=3).until(ec.visibility_of_element_located((By.XPATH, '/html/body/table/tbody/tr/td/table/tbody/tr[8]/td/table/tbody/tr[8]/td/table/tbody/tr/td[1]/strong')))
+  except TimeoutException:
+    output_status_element = WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/div[3]/div/p[1]')))
+    output_status = output_status_element.text
+    transaction_element = WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/div[3]/div/p[1]')))
+    transaction_output_status = transaction_element.text
+  else :
+    output_status_element = WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.XPATH, '/html/body/table/tbody/tr/td/table/tbody/tr[8]/td/table/tbody/tr[8]/td/table/tbody/tr/td[1]/strong')))
+    output_status = output_status_element.text
+    transaction_element = WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.XPATH, '/html/body/table/tbody/tr/td/table/tbody/tr[8]/td/table/tbody/tr[8]/td/table/tbody/tr/td[3]/strong ')))
+    transaction_output_status = transaction_element.text
 
 def output_save():
   entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_atm_pin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
@@ -184,7 +198,12 @@ def timeout_exception():
     time.sleep(2)
     pagetwo()
     pagethree()
+    time.sleep(2)
+    output()
+    print(output_status)
+    print(transaction_output_status)
     print ("exception")
+    return
 
 def whole_work():
     start_link()
@@ -193,6 +212,11 @@ def whole_work():
     time.sleep(2)
     pagetwo()
     pagethree()
+    time.sleep(2)
+    output()
+    print(output_status)
+    print(transaction_output_status)
+    time.sleep(1000)
 
 
 caps = DesiredCapabilities().CHROME
@@ -216,3 +240,8 @@ else:
     done_transactions_wb_1[h] = 0
 
 driver.quit()
+
+
+#/html/body/div[1]/div[3]/div/p[1] #failed
+#/html/body/table/tbody/tr/td/table/tbody/tr[8]/td/table/tbody/tr[8]/td/table/tbody/tr/td[1]/strong # success
+#/html/body/table/tbody/tr/td/table/tbody/tr[8]/td/table/tbody/tr[8]/td/table/tbody/tr/td[3]/strong  #txn ID
