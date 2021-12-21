@@ -343,6 +343,7 @@ def output():
       WebDriverWait(driver, timeout=3).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="checkout-parent"]/div[2]/div[2]/div')))
     except TimeoutException :
       try:
+        driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
         WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="fd-t"]')))
       except TimeoutException:
         timeout_exception = True
