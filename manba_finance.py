@@ -162,7 +162,7 @@ def page_two():
   button_field('//*[@id="btnPay"]', 8)
 
 def page_three():
-
+  global timeout_exception
   driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
   time.sleep(0.50)
   driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
@@ -170,8 +170,19 @@ def page_three():
   textbox_field('//*[@id="contact"]', 8, settings_data['registered_mobile_no'])
   textbox_field('//*[@id="email"]', 8, settings_data['email_id'])
   button_field('//*[@id="footer-cta"]', 8)
-  
-  textbox_field_click_css_selector('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)', 8)
+  time.sleep(0.50)
+  try :
+    WebDriverWait(driver, timeout=4).until(ec.visibility_of_element_located((By.CSS_SELECTOR, '#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)')))
+  except TimeoutException:
+    timeout_exception = True
+  else :
+    pay_type = driver.find_element_by_css_selector('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)')
+    print (pay_type.text)
+    if pay_type.text == "Pay using Card":
+      textbox_field_click_css_selector('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)', 8)
+    else :
+      textbox_field_click_css_selector('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div:nth-child(2) > div > button:nth-child(1) > div > div.svelte-1u727jy > div:nth-child(1)', 8)
+
   textbox_field('//*[@id="card_number"]', 8, input_workbook_cc_number[x])
   textbox_field('//*[@id="card_expiry"]', 8, expiry_month + expiry_year3 + expiry_year4)
   textbox_field('//*[@id="card_name"]', 8, settings_data['first_name'])
@@ -263,10 +274,10 @@ def output():
   except TimeoutException:
     driver.switch_to.window(driver.window_handles[0])
     driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
-    time.sleep(0.50)
-    driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
+    #time.sleep(2)
+    #driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
     try :
-      WebDriverWait(driver, timeout=3).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="checkout-parent"]/div[2]/div[2]/text()[1]')))
+      WebDriverWait(driver, timeout=3).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="checkout-parent"]/div[2]/div[2]/div')))
     except TimeoutException :
       try:
         WebDriverWait(driver, timeout=1).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="fd-t"]')))
@@ -278,9 +289,9 @@ def output():
         transaction_output_status = '-'
         timeout_exception = False
     else :
-      output_status_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]/text()[1]')
+      output_status_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]')
       output_status = output_status_element.text
-      transaction_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]/div/text()[2]')
+      transaction_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]/div')
       transaction_output_status = transaction_element.text
       timeout_exception = False
   else :
@@ -292,9 +303,12 @@ def output():
     else :
       driver.find_element_by_xpath ('//*[@id="cancel"]').click()
     driver.switch_to.window(driver.window_handles[0])
+    driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
+    time.sleep(0.50)
+    driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
     output_status = "Please enter correct IPIN / WEB PIN"
-    transaction_element = driver.find_element_by_xpath('//*[@id="fd-t"]')
-    transaction_output_status = transaction_element.text
+    transaction_output_status = "-"
+    time.sleep(1)
 
 def output_save():
   entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_ipin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], output_status, transaction_output_status, z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
