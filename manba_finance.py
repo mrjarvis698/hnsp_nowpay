@@ -107,21 +107,26 @@ def cc_expiry():
 
 def textbox_field(xpath, timeout_time, send_keys_data):
   global timeout_exception
+  global timeout_exception1
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
   except TimeoutException:
     timeout_exception = True
+    timeout_exception1 = True
   else :
     timeout_exception = False
+    timeout_exception1 = False
     textbox_elements = driver.find_element_by_xpath (xpath)
     textbox_elements.send_keys(send_keys_data)
 
 def button_field(button_xpath, timeout_time):
   global timeout_exception
+  global timeout_exception1
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, button_xpath)))
   except TimeoutException:
     timeout_exception = True
+    timeout_exception1 = True
   else :
     timeout_exception = False
     page_button = driver.find_element_by_xpath (button_xpath)
@@ -130,22 +135,28 @@ def button_field(button_xpath, timeout_time):
 
 def textbox_field_click(xpath, timeout_time):
   global timeout_exception
+  global timeout_exception1
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
   except TimeoutException:
     timeout_exception = True
+    timeout_exception1 = True
   else :
     timeout_exception = False
+    timeout_exception1 = False
     act.click(driver.find_element_by_xpath (xpath)).perform()
 
 def textbox_field_click_css_selector(xpath, timeout_time):
   global timeout_exception
+  global timeout_exception1
   try :
     WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.CSS_SELECTOR, xpath)))
   except TimeoutException:
     timeout_exception = True
+    timeout_exception1 = True
   else :
     timeout_exception = False
+    timeout_exception1 = False
     act.click(driver.find_element_by_css_selector (xpath)).perform()
   
 def start_link():
@@ -163,6 +174,7 @@ def page_two():
 
 def page_three():
   global timeout_exception
+  global timeout_exception1
   driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
   time.sleep(0.50)
   driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
@@ -175,6 +187,7 @@ def page_three():
     WebDriverWait(driver, timeout=4).until(ec.visibility_of_element_located((By.CSS_SELECTOR, '#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)')))
   except TimeoutException:
     timeout_exception = True
+    timeout_exception1 = False
   else :
     pay_type = driver.find_element_by_css_selector('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)')
     print (pay_type.text)
@@ -194,81 +207,11 @@ def page_four():
   textbox_field('//*[@id="ipin"]', 8, input_workbook_ipin[x])
   button_field('//*[@id="otpbut"]', 8)
 
-# exception
-def textbox_field1(xpath, timeout_time, send_keys_data):
-  global timeout_exception1
-  try :
-    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
-  except TimeoutException:
-    timeout_exception1 = True
-  else :
-    timeout_exception1 = False
-    textbox_elements = driver.find_element_by_xpath (xpath)
-    textbox_elements.send_keys(send_keys_data)
-
-def button_field1(button_xpath, timeout_time):
-  global timeout_exception1
-  try :
-    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, button_xpath)))
-  except TimeoutException:
-    timeout_exception1 = True
-  else :
-    timeout_exception1 = False
-    page_button = driver.find_element_by_xpath (button_xpath)
-    page_button.click()
-
-
-def textbox_field_click1(xpath, timeout_time):
-  global timeout_exception1
-  try :
-    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.XPATH, xpath)))
-  except TimeoutException:
-    timeout_exception1 = True
-  else :
-    timeout_exception1 = False
-    act.click(driver.find_element_by_xpath (xpath)).perform()
-
-def textbox_field_click_css_selector1(xpath, timeout_time):
-  global timeout_exception1
-  try :
-    WebDriverWait(driver, timeout=timeout_time).until(ec.visibility_of_element_located((By.CSS_SELECTOR, xpath)))
-  except TimeoutException:
-    timeout_exception1 = True
-  else :
-    timeout_exception1 = False
-    act.click(driver.find_element_by_css_selector (xpath)).perform()
-
-def page_one1():
-  textbox_field1('//*[@id="txtlanno"]', 8, settings_data['LAN'])
-  button_field1('//*[@id="next"]', 8)
-
-def page_two1():
-  time.sleep(0.75)
-  textbox_field_click1('//*[@id="Other"]', 8)
-  textbox_field1('//*[@id="txtamount"]', 8, settings_data['payable_amount'])
-  button_field1('//*[@id="btnPay"]', 8)
-
-def page_three1():
-
-  driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
-  time.sleep(0.50)
-  driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
-  #driver.switch_to.frame(driver.find_element_by_class_name("razorpay-checkout-frame"))
-  textbox_field1('//*[@id="contact"]', 8, settings_data['registered_mobile_no'])
-  textbox_field1('//*[@id="email"]', 8, settings_data['email_id'])
-  button_field1('//*[@id="footer-cta"]', 8)
-  
-  textbox_field_click_css_selector1('#form-common > div.screen.screen-comp.svelte-3j22k8 > div > div > div.home-methods.svelte-1ai009r > div.methods-block.svelte-v8dhx4 > div > button.instrument.slotted-option.svelte-1u727jy > div > div.svelte-1u727jy > div:nth-child(1)', 8)
-  textbox_field1('//*[@id="card_number"]', 8, input_workbook_cc_number[x])
-  textbox_field1('//*[@id="card_expiry"]', 8, expiry_month + expiry_year3 + expiry_year4)
-  textbox_field1('//*[@id="card_name"]', 8, settings_data['first_name'])
-  textbox_field1('//*[@id="card_cvv"]', 8, input_workbook_cvv_number[x])
-  button_field1('//*[@id="footer-cta"]', 8)
-
 def output():
   global output_status
   global transaction_output_status
   global timeout_exception
+  global timeout_exception1  
   try :
     WebDriverWait(driver, timeout=2).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="set"]/div/div/div[2]/div/div[3]/font')))
   except TimeoutException:
@@ -283,17 +226,20 @@ def output():
         WebDriverWait(driver, timeout=1).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="fd-t"]')))
       except TimeoutException:
         timeout_exception = True
+        timeout_exception1 = True
       else:
         output_status_element = driver.find_element_by_xpath('//*[@id="fd-t"]')
         output_status = output_status_element.text
         transaction_output_status = '-'
         timeout_exception = False
+        timeout_exception1 = False
     else :
       output_status_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]')
       output_status = output_status_element.text
       transaction_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]/div')
       transaction_output_status = transaction_element.text
       timeout_exception = False
+      timeout_exception1 = False
   else :
     try :
       driver.find_element_by_xpath ('//*[@id="cancel"]')
@@ -318,14 +264,6 @@ def output_save():
       page.append(info)
   output_wb.save(filename='Output.xlsx')
 
-def exception_work():
-    start_link()
-    page_one1()
-    page_two1()
-    cc_expiry()
-    page_three1()
-    output()
-
 def whole_work():
     start_link()
     page_one()
@@ -334,6 +272,16 @@ def whole_work():
     page_three()
     page_four()
     output()
+
+# exception
+def retry_1 ():
+  start_link()
+  page_one()
+  page_two()
+  cc_expiry()
+  page_three()
+  page_four()
+  output()
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
@@ -350,16 +298,29 @@ except IndexError:
   for x in range (0 , number_of_rows):
     for z in range (0, int(settings_data['number_of_time_transactions_per_card'])):
       whole_work()
-      output_save()
+      if timeout_exception == True:
+        retry_1()
+        if timeout_exception1 == True:
+          output_status = "Null"
+          transaction_output_status = "-"
+        else:
+          output_save()
+      else:
+        output_save()
 else:
   last_txncard =  input_workbook[input_workbook['Card Number'] == output_cc_number[h]].index[0]
   for x in range (last_txncard , number_of_rows):
     for z in range (done_transactions_wb_1[h], int(settings_data['number_of_time_transactions_per_card'])):
       whole_work()
-      output_save()
+      if timeout_exception == True:
+        retry_1()
+        if timeout_exception1 == True:
+          output_status = "Null"
+          transaction_output_status = "-"
+        else:
+          output_save()
+      else:
+        output_save()
     done_transactions_wb_1[h] = 0
 
 driver.quit()
-
-#failed //*[@id="fd-t"]
-#//*[@id="checkout-parent"]/div[2]/div[2]/text()[1] # success
