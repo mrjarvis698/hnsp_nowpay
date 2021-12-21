@@ -166,23 +166,8 @@ def page_two():
     submit_button = driver.find_element_by_xpath ('//*[@id="btnPay"]')
     submit_button.click()
 
-def page_extra():
-  driver.switch_to.frame(WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
-
-  # Proceed Button
-  try :
-    WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="mob-payment-btn"]')))
-  except TimeoutException:
-    timeout_exception = True
-    timeout_exception1 = True
-  else :
-    timeout_exception = False
-    timeout_exception1 = False
-    submit_button = driver.find_element_by_xpath ('//*[@id="mob-payment-btn"]')
-    submit_button.click()
-
 def page_three():
-  
+  driver.switch_to.frame(WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
   driver.switch_to.frame(WebDriverWait(driver, timeout=10).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
   # Phone
   try :
@@ -384,7 +369,6 @@ def whole_work():
     start_link()
     page_one()
     page_two()
-    page_extra()
     page_three()
     page_four()
     page_five()
