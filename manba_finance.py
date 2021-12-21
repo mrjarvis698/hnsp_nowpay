@@ -69,7 +69,7 @@ output_sheet = path.exists("Output.xlsx")
 if output_sheet == True :
   output_sheet_file_path = "Output.xlsx"
 else :
-  output_headers= ['FirstName','LastName', 'Mobile', 'Email','Amount', 'CardNumber', 'CVV', 'Expiry', 'Ipin', 'No.of Transactions', 'Desk', "Desk Holder"]
+  output_headers= ['FirstName','LastName', 'Mobile', 'Email','Amount', 'CardNumber', 'CVV', 'Expiry', 'Ipin', 'Status', 'Transation No', 'No.of Transactions', 'Desk', "Desk Holder"]
   overall_output = Workbook()
   page = overall_output.active
   page.append(output_headers)
@@ -83,7 +83,7 @@ def cal():
   output_load_wb_2 = pd.read_excel(output_sheet_file_path, sheet_name = 'Sheet', usecols = 'F', dtype=str)
   output_load_wb_2.head()
   output_cc_number = output_load_wb_2['CardNumber'].values.tolist()
-  output_load_wb_1 = pd.read_excel(output_sheet_file_path, sheet_name = 'Sheet', usecols = 'J', dtype=int)
+  output_load_wb_1 = pd.read_excel(output_sheet_file_path, sheet_name = 'Sheet', usecols = 'L', dtype=int)
   output_load_wb_1.head()
   done_transactions_wb_1 = output_load_wb_1['No.of Transactions'].values.tolist()
   h = len(output_load_wb_1.index) - 1
@@ -178,6 +178,11 @@ def page_three():
   textbox_field('//*[@id="card_cvv"]', 8, input_workbook_cvv_number[x])
   button_field('//*[@id="footer-cta"]', 8)
 
+def page_four():
+  driver.switch_to.window(driver.window_handles[1])
+  textbox_field('//*[@id="ipin"]', 8, input_workbook_ipin[x])
+  button_field('//*[@id="otpbut"]', 8)
+
 # exception
 def textbox_field1(xpath, timeout_time, send_keys_data):
   global timeout_exception1
@@ -249,8 +254,50 @@ def page_three1():
   textbox_field1('//*[@id="card_cvv"]', 8, input_workbook_cvv_number[x])
   button_field1('//*[@id="footer-cta"]', 8)
 
+def output():
+  global output_status
+  global transaction_output_status
+  global timeout_exception
+  try :
+    WebDriverWait(driver, timeout=2).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="set"]/div/div/div[2]/div/div[3]/font')))
+  except TimeoutException:
+    driver.switch_to.window(driver.window_handles[0])
+    driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "paymtiframe"))))
+    time.sleep(0.50)
+    driver.switch_to.frame(WebDriverWait(driver, timeout=8).until(ec.visibility_of_element_located((By.CLASS_NAME, "razorpay-checkout-frame"))))
+    try :
+      WebDriverWait(driver, timeout=3).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="checkout-parent"]/div[2]/div[2]/text()[1]')))
+    except TimeoutException :
+      try:
+        WebDriverWait(driver, timeout=1).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="fd-t"]')))
+      except TimeoutException:
+        timeout_exception = True
+      else:
+        output_status_element = driver.find_element_by_xpath('//*[@id="fd-t"]')
+        output_status = output_status_element.text
+        transaction_output_status = '-'
+        timeout_exception = False
+    else :
+      output_status_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]/text()[1]')
+      output_status = output_status_element.text
+      transaction_element = driver.find_element_by_xpath('//*[@id="checkout-parent"]/div[2]/div[2]/div/text()[2]')
+      transaction_output_status = transaction_element.text
+      timeout_exception = False
+  else :
+    try :
+      driver.find_element_by_xpath ('//*[@id="cancel"]')
+    except NoSuchElementException:
+      time.sleep(1)
+      driver.find_element_by_xpath ('//*[@id="cancel"]').click()
+    else :
+      driver.find_element_by_xpath ('//*[@id="cancel"]').click()
+    driver.switch_to.window(driver.window_handles[0])
+    output_status = "Please enter correct IPIN / WEB PIN"
+    transaction_element = driver.find_element_by_xpath('//*[@id="fd-t"]')
+    transaction_output_status = transaction_element.text
+
 def output_save():
-  entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_atm_pin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
+  entry_list = [[settings_data['first_name'], settings_data['last_name'], settings_data['registered_mobile_no'], settings_data['email_id'], settings_data['payable_amount'], input_workbook_cc_number[x], input_workbook_ipin[x], input_workbook_cvv_number[x], input_workbook_expiry_number[x], output_status, transaction_output_status, z+1, int(input_workbook_desk_number[x]), settings_data["desk_holder"]]]
   output_wb = load_workbook(output_sheet_file_path)
   page = output_wb.active
   for info in entry_list:
@@ -263,6 +310,7 @@ def exception_work():
     page_two1()
     cc_expiry()
     page_three1()
+    output()
 
 def whole_work():
     start_link()
@@ -270,6 +318,8 @@ def whole_work():
     page_two()
     cc_expiry()
     page_three()
+    page_four()
+    output()
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
@@ -286,11 +336,16 @@ except IndexError:
   for x in range (0 , number_of_rows):
     for z in range (0, int(settings_data['number_of_time_transactions_per_card'])):
       whole_work()
+      output_save()
 else:
   last_txncard =  input_workbook[input_workbook['Card Number'] == output_cc_number[h]].index[0]
   for x in range (last_txncard , number_of_rows):
     for z in range (done_transactions_wb_1[h], int(settings_data['number_of_time_transactions_per_card'])):
       whole_work()
+      output_save()
     done_transactions_wb_1[h] = 0
 
 driver.quit()
+
+#failed //*[@id="fd-t"]
+#//*[@id="checkout-parent"]/div[2]/div[2]/text()[1] # success
